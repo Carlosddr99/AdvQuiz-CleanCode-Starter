@@ -47,12 +47,20 @@ public class QuestionPresenter implements QuestionContract.Presenter {
   public void onRestart() {
     Log.e(TAG, "onRestart()");
 
-      if(state.optionClicked){
-        view.get().updateReply(!state.cheatEnabled);
-      }else {
-        view.get().resetReply();
-      }
-      view.get().displayQuestion(state);
+        if (state.optionClicked) {
+          if (model.isCorrectOption(state.option)) {
+            view.get().updateReply(true);
+
+          } else {
+            view.get().updateReply(false);
+          }
+        }else {
+            view.get().resetReply();
+          }
+
+
+
+
 
 
     //TODO: falta implementacion
@@ -72,7 +80,17 @@ public class QuestionPresenter implements QuestionContract.Presenter {
 
       state.answerCheated=savedState.answerCheated;
       if(state.answerCheated){
-        onNextButtonClicked();
+        if(model.hasQuizFinished()){
+          state.optionEnabled=false;
+          state.nextEnabled=false;
+
+        }else{
+          onNextButtonClicked();
+        }
+
+
+
+
       }
     }
 
@@ -94,7 +112,15 @@ public class QuestionPresenter implements QuestionContract.Presenter {
 
     boolean isCorrect = model.isCorrectOption(option);
     state.optionClicked=true;
-    state.option=option;
+    if(option == 1){
+      state.option = 1;
+    }
+    if(option == 2){
+      state.option = 2;
+    }
+    else{
+      state.option = 3;
+    }
 
     if(isCorrect) {
 
@@ -122,6 +148,7 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     state.option1=model.getOption1();
     state.option2=model.getOption2();
     state.option3=model.getOption3();
+    state.optionClicked=false;
     view.get().resetReply();
     disableNextButton();
     view.get().displayQuestion(state);
@@ -139,7 +166,9 @@ public class QuestionPresenter implements QuestionContract.Presenter {
     String pasarCheat=model.getAnswer();
     QuestionToCheatState estado_Cheat= new QuestionToCheatState(pasarCheat);
     passStateToCheatScreen(estado_Cheat);
+
     view.get().navigateToCheatScreen();
+
 
     //TODO: falta implementacion
   }
